@@ -21,7 +21,7 @@ function getFirstImage(slug: string): ImageMetadata | null {
 ---
 
 <nav class="site-nav">
-  <a href="/" class="site-name">Jason Contangelo</a>
+  <a href={import.meta.env.BASE_URL} class="site-name">Jason Contangelo</a>
 
   <button class="nav-toggle" aria-label="Toggle navigation" id="nav-toggle">&#9776;</button>
 
@@ -29,7 +29,7 @@ function getFirstImage(slug: string): ImageMetadata | null {
     <li>
       <button class="work-toggle" id="work-toggle-desktop">Work</button>
     </li>
-    <li><a href="/about">About</a></li>
+    <li><a href={`${import.meta.env.BASE_URL}about`}>About</a></li>
   </ul>
 </nav>
 
@@ -40,7 +40,7 @@ function getFirstImage(slug: string): ImageMetadata | null {
     {sortedGalleries.map((gallery) => {
       const thumb = getFirstImage(gallery.id);
       return (
-        <a href={`/${gallery.id}`} class="work-overlay-item">
+        <a href={`${import.meta.env.BASE_URL}${gallery.id}`} class="work-overlay-item">
           {thumb ? (
             <Image
               src={thumb}
@@ -59,7 +59,7 @@ function getFirstImage(slug: string): ImageMetadata | null {
     })}
   </div>
 
-  <a href="/about" class="work-overlay-about">About</a>
+  <a href={`${import.meta.env.BASE_URL}about`} class="work-overlay-about">About</a>
 </div>
 
 <script>
