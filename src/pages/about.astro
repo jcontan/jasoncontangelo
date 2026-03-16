@@ -1,0 +1,70 @@
+---
+import Layout from '../components/Layout.astro';
+import { Image } from 'astro:assets';
+
+const portraitImages = import.meta.glob<{ default: ImageMetadata }>(
+  '/src/assets/about/*.{jpg,jpeg,png,webp}',
+  { eager: true }
+);
+const portrait = Object.values(portraitImages)[0]?.default;
+---
+
+<Layout title="About">
+  <div class="about-container">
+    <div class="about-portrait">
+      {portrait ? (
+        <Image
+          src={portrait}
+          alt="Jason Contangelo"
+          width={400}
+          format="webp"
+          quality={85}
+        />
+      ) : (
+        <div style="width:400px;height:500px;background:#1a1a1a;"></div>
+      )}
+    </div>
+
+    <div class="about-text">
+      <h2>About</h2>
+
+      <p>
+        Jason Contangelo (b. 1992, Buffalo, NY) is an artist working primarily
+        in experimental photography. He received his BA from the University of
+        Michigan, an MA from North American Lutheran Seminary, and an MFA from
+        the University at Buffalo (2021). He taught studio art at Hope College
+        in Holland, Michigan for two years and is now based in Tonawanda, NY.
+      </p>
+
+      <p>
+        His work has been exhibited at University at Buffalo Galleries, CEPA
+        Gallery (Buffalo), De Pree Gallery (Holland, MI), and BOX Gallery
+        (Buffalo), among others.
+      </p>
+
+      <h2 style="margin-top: 2rem;">Artist Statement</h2>
+
+      <p>
+        Working primarily with analog methods&mdash;silver gelatin, chromogenic
+        prints, lumen prints, and other processes&mdash;Contangelo explores
+        spiritual and psychological dimensions alongside natural landscapes and
+        unconventional portraiture.
+      </p>
+
+      <p>
+        His core preoccupation centers on the multifaceted alienation of
+        mankind from the natural world and from itself. He deliberately moves
+        away from realistic representation, prioritizing photographs that
+        subvert their very ties to reality through entropy, chaos, and visual
+        artifacts that mirror scattered thoughts.
+      </p>
+
+      <div class="about-contact">
+        <a href="mailto:jasoncontangelo@gmail.com">jasoncontangelo@gmail.com</a>
+        <a href="https://instagram.com/jasoncontangelo" target="_blank" rel="noopener">
+          @jasoncontangelo
+        </a>
+      </div>
+    </div>
+  </div>
+</Layout>

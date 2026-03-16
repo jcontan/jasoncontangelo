@@ -1,0 +1,33 @@
+---
+import Layout from '../components/Layout.astro';
+import { Image } from 'astro:assets';
+
+// This will be replaced with the actual downloaded hero image
+// For now, using a placeholder path
+const heroImages = import.meta.glob<{ default: ImageMetadata }>(
+  '/src/assets/homepage/*.{jpg,jpeg,png,webp}',
+  { eager: true }
+);
+const heroImage = Object.values(heroImages)[0]?.default;
+---
+
+<Layout>
+  <section class="hero">
+    {heroImage ? (
+      <Image
+        src={heroImage}
+        alt="Icon (black halo), 2021. Gelatin silver print, 4×5 inches."
+        width={600}
+        format="webp"
+        quality={90}
+      />
+    ) : (
+      <div style="width:400px;height:500px;background:#1a1a1a;display:flex;align-items:center;justify-content:center;color:#555;">
+        Hero image pending
+      </div>
+    )}
+    <p class="hero-caption">
+      <em>Icon (black halo)</em>, 2021. Gelatin silver print, 4&times;5&Prime;.
+    </p>
+  </section>
+</Layout>

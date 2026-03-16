@@ -1,0 +1,79 @@
+---
+import { Image } from 'astro:assets';
+
+interface Props {
+  slug: string;
+  captionPattern?: string;
+}
+
+const { slug, captionPattern } = Astro.props;
+
+// Import all gallery images dynamically
+const allImages = import.meta.glob<{ default: ImageMetadata }>(
+  '/src/assets/galleries/**/*.{jpg,jpeg,png,webp}',
+  { eager: true }
+);
+
+// Filter to just this gallery's images and sort by filename
+const galleryImages = Object.entries(allImages)
+  .filter(([path]) => path.includes(`/galleries/${slug}/`))
+  .sort(([a], [b]) => a.localeCompare(b, undefined, { numeric: true }))
+  .map(([path, mod]) => ({
+    src: mod.default,
+    filename: path.split('/').pop()?.replace(/\.\w+$/, '') || '',
+  }));
+
+function getCaption(filename: string, index: number): string | null {
+  if (!captionPattern) return null;
+  return captionPattern.replace('{n}', String(index + 1));
+}
+---
+
+<div class="gallery-grid">
+  {galleryImages.map((img, i) => (
+    <div>
+      <Image
+        src={img.src}
+        alt={getCaption(img.filename, i) || `Image ${i + 1}`}
+        widths={[400, 800, 1200]}
+        sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+        format="webp"
+        quality={80}
+        loading={i < 8 ? 'eager' : 'lazy'}
+        class="gallery-image"
+        data-full={img.src.src}
+      />
+      {getCaption(img.filename, i) && (
+        <div class="gallery-caption">{getCaption(img.filename, i)}</div>
+      )}
+    </div>
+  ))}
+</div>
+
+<div class="lightbox" id="lightbox">
+  <img src="" alt="" id="lightbox-img" />
+</div>
+
+<script>
+  const grid = document.querySelector('.gallery-grid');
+  const lightbox = document.getElementById('lightbox');
+  const lightboxImg = document.getElementById('lightbox-img') as HTMLImageElement;
+
+  grid?.addEventListener('click', (e) => {
+    const img = (e.target as HTMLElement).closest('.gallery-image') as HTMLImageElement;
+    if (!img) return;
+    lightboxImg.src = img.dataset.full || img.src;
+    lightboxImg.alt = img.alt;
+    lightbox?.classList.add('active');
+  });
+
+  lightbox?.addEventListener('click', () => {
+    lightbox.classList.remove('active');
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      lightbox?.classList.remove('active');
+    }
+  });
+</script>

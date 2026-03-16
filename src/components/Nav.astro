@@ -1,0 +1,93 @@
+---
+import { getCollection } from 'astro:content';
+import { Image } from 'astro:assets';
+
+const galleries = await getCollection('galleries');
+const sortedGalleries = galleries.sort((a, b) => a.data.order - b.data.order);
+
+// Import first image from each gallery for thumbnails
+const allImages = import.meta.glob<{ default: ImageMetadata }>(
+  '/src/assets/galleries/**/*.{jpg,jpeg,png,webp}',
+  { eager: true }
+);
+
+// Get first image per gallery
+function getFirstImage(slug: string): ImageMetadata | null {
+  const entries = Object.entries(allImages)
+    .filter(([path]) => path.includes(`/galleries/${slug}/`))
+    .sort(([a], [b]) => a.localeCompare(b, undefined, { numeric: true }));
+  return entries[0]?.[1]?.default || null;
+}
+---
+
+<nav class="site-nav">
+  <a href="/" class="site-name">Jason Contangelo</a>
+
+  <button class="nav-toggle" aria-label="Toggle navigation" id="nav-toggle">&#9776;</button>
+
+  <ul class="nav-links" id="nav-links">
+    <li>
+      <button class="work-toggle" id="work-toggle-desktop">Work</button>
+    </li>
+    <li><a href="/about">About</a></li>
+  </ul>
+</nav>
+
+<div class="work-overlay" id="work-overlay">
+  <button class="work-overlay-close" id="work-overlay-close" aria-label="Close">&times;</button>
+
+  <div class="work-overlay-grid">
+    {sortedGalleries.map((gallery) => {
+      const thumb = getFirstImage(gallery.id);
+      return (
+        <a href={`/${gallery.id}`} class="work-overlay-item">
+          {thumb ? (
+            <Image
+              src={thumb}
+              alt={gallery.data.title}
+              width={300}
+              format="webp"
+              quality={70}
+              loading="lazy"
+            />
+          ) : (
+            <div style="width:100%;aspect-ratio:1;background:#1a1a1a;" />
+          )}
+          <span>{gallery.data.title}</span>
+        </a>
+      );
+    })}
+  </div>
+
+  <a href="/about" class="work-overlay-about">About</a>
+</div>
+
+<script>
+  const overlay = document.getElementById('work-overlay');
+  const closeBtn = document.getElementById('work-overlay-close');
+  const workToggleDesktop = document.getElementById('work-toggle-desktop');
+  const navToggle = document.getElementById('nav-toggle');
+
+  function openOverlay() {
+    if (overlay) overlay.scrollTop = 0;
+    overlay?.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeOverlay() {
+    overlay?.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  workToggleDesktop?.addEventListener('click', openOverlay);
+  navToggle?.addEventListener('click', openOverlay);
+  closeBtn?.addEventListener('click', closeOverlay);
+
+  overlay?.addEventListener('click', (e) => {
+    if (e.target === overlay) closeOverlay();
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeOverlay();
+  });
+</script>

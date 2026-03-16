@@ -1,0 +1,7 @@
+---
+title: "Numina"
+order: 8
+imageCount: 53
+---
+
+NUMINA (2020) was a landscape and photo-process project in which conventional landscape aesthetics were enmeshed in purposefully entropic methods of deterioration. The title, latin for the ‘spirits of a place,’ suggests the intention of the work; to allow for a novel presence, a mystical mode of seeing, to emerge from the photographs. A series of medium-format rolls of Kodak Ektachrome were shot during a single day hike in the Niagara Gorge, and then exposed to a randomly color-shifting lightbulb midway through development, resulting in a color implementation of the sabattier effect (false solarization). These images were often double exposures of the same composition at different points of focus, with the image thereby partially obscuring itself. For NUMINA , these film stills were scanned digitally using an imacon scanner; the scanner software itself determined the final color balance and exposure, which in many cases resulting in significant (and distinctly digital) departures from the film image. This same body of film images was used for Overgrowth , my MFA thesis exhibition, employed as ‘negatives’ within an analog color printing process. Yet, few images were used for both projects; the digital scanner favored certain characteristics, while the color darkroom favored other ones entirely. NUMINA was also released as an artist’s book in a limited edition of 10, pictured below.

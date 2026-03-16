@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:jasoncontangelo.com)",
+      "WebFetch(domain:www.jasoncontangelo.com)"
+    ]
+  }
+}

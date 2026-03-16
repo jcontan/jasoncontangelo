@@ -1,0 +1,39 @@
+---
+import { getCollection, render } from 'astro:content';
+import Layout from '../components/Layout.astro';
+import GalleryGrid from '../components/GalleryGrid.astro';
+
+export async function getStaticPaths() {
+  const galleries = await getCollection('galleries');
+  return galleries.map((gallery) => ({
+    params: { slug: gallery.id },
+    props: { gallery },
+  }));
+}
+
+const { gallery } = Astro.props;
+const { Content } = await render(gallery);
+---
+
+<Layout title={gallery.data.title}>
+  <div class="gallery-header">
+    <h1>{gallery.data.title}</h1>
+  </div>
+
+  <GalleryGrid
+    slug={gallery.id}
+    captionPattern={gallery.data.captionPattern}
+  />
+
+  <div class="gallery-description">
+    <Content />
+  </div>
+
+  {gallery.data.externalLink && (
+    <div class="gallery-link">
+      <a href={gallery.data.externalLink} target="_blank" rel="noopener">
+        {gallery.data.externalLinkText || 'View Collection'}
+      </a>
+    </div>
+  )}
+</Layout>
