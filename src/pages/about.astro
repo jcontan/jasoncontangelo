@@ -6,7 +6,10 @@ const portraitImages = import.meta.glob<{ default: ImageMetadata }>(
   '/src/assets/about/*.{jpg,jpeg,png,webp}',
   { eager: true }
 );
-const portrait = Object.values(portraitImages)[0]?.default;
+// Prefer bobby-triune if available
+const entries = Object.entries(portraitImages);
+const triune = entries.find(([path]) => path.includes('bobby-triune'));
+const portrait = triune ? triune[1].default : entries[0]?.[1]?.default;
 ---
 
 <Layout title="About">
@@ -16,7 +19,7 @@ const portrait = Object.values(portraitImages)[0]?.default;
         <Image
           src={portrait}
           alt="Jason Contangelo"
-          width={400}
+          width={500}
           format="webp"
           quality={85}
         />
@@ -29,34 +32,33 @@ const portrait = Object.values(portraitImages)[0]?.default;
       <h2>About</h2>
 
       <p>
-        Jason Contangelo (b. 1992, Buffalo, NY) is an artist working primarily
-        in experimental photography. He received his BA from the University of
-        Michigan, an MA from North American Lutheran Seminary, and an MFA from
-        the University at Buffalo (2021). He taught studio art at Hope College
-        in Holland, Michigan for two years and is now based in Tonawanda, NY.
+        Jason Contangelo (b. 1992, Buffalo, NY) is an experimental photographer.
+        He completed his BA at the University of Michigan (2014), and his MFA at
+        the University at Buffalo (2021). He taught photography for two years at
+        Hope College in Holland, Michigan, and is now an independent artist and
+        art director based in Tonawanda, NY.
+      </p>
+
+      <p>
+        As Bobby Mars, Contangelo currently serves as the Art Director of the
+        Michigan Enjoyer, and CEO of his own art direction firm BobbyCorp LLC.
       </p>
 
       <p>
         His work has been exhibited at University at Buffalo Galleries, CEPA
         Gallery (Buffalo), De Pree Gallery (Holland, MI), and BOX Gallery
-        (Buffalo), among others.
+        (Buffalo), Fitz Books (Buffalo), and Black Rock Arts (Buffalo), among
+        others.
       </p>
 
       <h2 style="margin-top: 2rem;">Artist Statement</h2>
 
       <p>
-        Working primarily with analog methods&mdash;silver gelatin, chromogenic
-        prints, lumen prints, and other processes&mdash;Contangelo explores
-        spiritual and psychological dimensions alongside natural landscapes and
-        unconventional portraiture.
-      </p>
-
-      <p>
-        His core preoccupation centers on the multifaceted alienation of
-        mankind from the natural world and from itself. He deliberately moves
-        away from realistic representation, prioritizing photographs that
-        subvert their very ties to reality through entropy, chaos, and visual
-        artifacts that mirror scattered thoughts.
+        Through analog photographic methods, Contangelo explores spirituality
+        and psychology through abstracted landscapes and unconventional
+        portraiture. He eschews realistic representation in favor of photographs
+        that subvert their very ties to reality through entropy, chaos, and
+        visual process artifacts.
       </p>
 
       <div class="about-contact">
@@ -68,3 +70,58 @@ const portrait = Object.values(portraitImages)[0]?.default;
     </div>
   </div>
 </Layout>
+
+<style>
+  .about-container {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 6rem 2rem 4rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2.5rem;
+  }
+
+  .about-portrait {
+    width: 100%;
+    text-align: center;
+  }
+
+  .about-portrait img {
+    width: 100%;
+    max-width: 500px;
+    height: auto;
+    margin: 0 auto;
+  }
+
+  .about-text {
+    width: 100%;
+  }
+
+  .about-text h2 {
+    font-size: 1.4rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+
+  .about-text p {
+    font-size: 0.9rem;
+    line-height: 1.8;
+    color: #ccc;
+    margin-bottom: 1em;
+  }
+
+  .about-contact {
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .about-contact a {
+    font-size: 0.85rem;
+    color: #ccc;
+    text-decoration: underline;
+  }
+</style>

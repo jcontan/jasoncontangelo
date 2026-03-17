@@ -130,8 +130,7 @@ h1, h2, h3 {
   transition: max-height 0.35s ease;
   display: flex;
   flex-direction: column;
-  width: 0;
-  min-width: 100%;
+  width: 100%;
 }
 
 .nav-dropdown.active {
@@ -151,7 +150,7 @@ h1, h2, h3 {
 
 .nav-dropdown-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 1rem;
   padding: 0.5rem 1.5rem 1.5rem;
 }
@@ -240,7 +239,7 @@ h1, h2, h3 {
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  padding: 6rem 2rem 2rem;
+  padding: 2rem 2rem 2rem;
 }
 
 .hero img {
@@ -385,7 +384,6 @@ h1, h2, h3 {
   }
 
   .nav-dropdown-grid {
-    grid-template-columns: repeat(2, 1fr);
     gap: 0.8rem;
     padding: 0.5rem 1rem 1rem;
   }
