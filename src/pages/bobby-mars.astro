@@ -1,0 +1,35 @@
+---
+import Layout from '../components/Layout.astro';
+import { Image } from 'astro:assets';
+
+const heroImages = import.meta.glob<{ default: ImageMetadata }>(
+  '/src/assets/galleries/bobby-mars/*.{jpg,jpeg,png,webp}',
+  { eager: true }
+);
+const heroImage = Object.values(heroImages)[0]?.default;
+---
+
+<Layout title="Bobby Mars">
+  <div class="gallery-header" style="padding: 5rem 2rem 1rem;">
+    <h1>Bobby Mars</h1>
+  </div>
+
+  <section class="hero" style="min-height: auto; padding-top: 0;">
+    {heroImage ? (
+      <Image
+        src={heroImage}
+        alt="Bobby Mars"
+        width={600}
+        format="webp"
+        quality={90}
+      />
+    ) : (
+      <div style="width:400px;height:500px;background:#1a1a1a;display:flex;align-items:center;justify-content:center;color:#555;">
+        Image pending
+      </div>
+    )}
+    <p class="hero-caption">
+      <a href="https://bobbymars.com" target="_blank" rel="noopener" style="color: inherit; text-decoration: underline;">Shadows</a> into light.
+    </p>
+  </section>
+</Layout>

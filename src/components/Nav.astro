@@ -1,53 +1,120 @@
 ---
 import { getCollection } from 'astro:content';
+import { Image } from 'astro:assets';
 
 const galleries = await getCollection('galleries');
 const sortedGalleries = galleries.sort((a, b) => a.data.order - b.data.order);
 const base = import.meta.env.BASE_URL;
+
+// Import first image from each gallery for thumbnails
+const allImages = import.meta.glob<{ default: ImageMetadata }>(
+  '/src/assets/galleries/**/*.{jpg,jpeg,png,webp}',
+  { eager: true }
+);
+
+function getFirstImage(slug: string): ImageMetadata | null {
+  const entries = Object.entries(allImages)
+    .filter(([path]) => path.includes(`/galleries/${slug}/`))
+    .sort(([a], [b]) => a.localeCompare(b, undefined, { numeric: true }));
+  return entries[0]?.[1]?.default || null;
+}
 ---
 
-<nav class="site-nav">
-  <a href={base} class="site-name">Jason Contangelo</a>
+<div class="nav-floating" id="nav-floating">
+  <div class="nav-bar" id="nav-bar">
+    <a href={base} class="nav-bar-name">Jason Contangelo</a>
+    <button class="nav-bar-hamburger" id="nav-hamburger" aria-label="Menu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+  </div>
 
-  <div class="work-pill-wrapper">
-    <button class="work-pill" id="work-pill">Work</button>
-    <div class="work-dropdown" id="work-dropdown">
-      {sortedGalleries.map((gallery) => (
-        <a href={`${base}${gallery.id}`} class="work-dropdown-item">
-          {gallery.data.title}
-        </a>
-      ))}
+  <div class="nav-dropdown" id="nav-dropdown">
+    <div class="nav-dropdown-scroll">
+      <div class="nav-dropdown-grid">
+        {sortedGalleries.map((gallery, i) => {
+          const thumb = getFirstImage(gallery.id);
+          const bmThumb = getFirstImage('bobby-mars');
+          return (
+            <>
+              <a href={`${base}${gallery.id}`} class="nav-dropdown-item">
+              {thumb ? (
+                <Image
+                  src={thumb}
+                  alt={gallery.data.title}
+                  width={300}
+                  format="webp"
+                  quality={70}
+                  loading="lazy"
+                />
+              ) : (
+                <div style="width:100%;aspect-ratio:1;background:#e0e0e0;" />
+              )}
+              <span>{gallery.data.title}</span>
+            </a>
+              {gallery.id === 'aqueous-ecology-niagara' && (
+                <a href={`${base}bobby-mars`} class="nav-dropdown-item">
+                  {bmThumb ? (
+                    <Image
+                      src={bmThumb}
+                      alt="Bobby Mars"
+                      width={300}
+                      format="webp"
+                      quality={70}
+                      loading="lazy"
+                    />
+                  ) : (
+                    <div style="width:100%;aspect-ratio:1;background:#e0e0e0;" />
+                  )}
+                  <span>Bobby Mars</span>
+                </a>
+              )}
+            </>
+          );
+        })}
+      </div>
+    </div>
+
+    <div class="nav-dropdown-footer">
+      <div class="nav-footer-links">
+        <a href={`${base}about`} class="nav-footer-link">About</a>
+        <a href="https://instagram.com/jasoncontangelo" target="_blank" rel="noopener" class="nav-footer-link">Insta</a>
+        <a href="mailto:jason@jasoncontangelo.com" class="nav-footer-link">Email</a>
+      </div>
     </div>
   </div>
-</nav>
+</div>
+
+<div class="nav-backdrop" id="nav-backdrop"></div>
 
 <script>
-  const pill = document.getElementById('work-pill');
-  const dropdown = document.getElementById('work-dropdown');
+  const hamburger = document.getElementById('nav-hamburger');
+  const dropdown = document.getElementById('nav-dropdown');
+  const floating = document.getElementById('nav-floating');
+  const backdrop = document.getElementById('nav-backdrop');
   let isOpen = false;
 
   function toggle() {
     isOpen = !isOpen;
     dropdown?.classList.toggle('active', isOpen);
-    pill?.classList.toggle('active', isOpen);
+    floating?.classList.toggle('open', isOpen);
+    backdrop?.classList.toggle('active', isOpen);
   }
 
   function close() {
     isOpen = false;
     dropdown?.classList.remove('active');
-    pill?.classList.remove('active');
+    floating?.classList.remove('open');
+    backdrop?.classList.remove('active');
   }
 
-  pill?.addEventListener('click', (e) => {
+  hamburger?.addEventListener('click', (e) => {
     e.stopPropagation();
     toggle();
   });
 
-  document.addEventListener('click', (e) => {
-    if (isOpen && !dropdown?.contains(e.target as Node)) {
-      close();
-    }
-  });
+  backdrop?.addEventListener('click', close);
 
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') close();

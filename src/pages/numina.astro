@@ -1,0 +1,139 @@
+---
+import Layout from '../components/Layout.astro';
+import { Image } from 'astro:assets';
+
+const allImages = import.meta.glob<{ default: ImageMetadata }>(
+  '/src/assets/galleries/numina/*.{jpg,jpeg,png,webp}',
+  { eager: true }
+);
+
+const images = Object.entries(allImages)
+  .sort(([a], [b]) => a.localeCompare(b, undefined, { numeric: true }))
+  .map(([path, mod]) => mod.default);
+
+const main = images.slice(0, 48);
+const end = images.slice(48);
+---
+
+<Layout title="Numina">
+  <div class="gallery-header">
+    <h1>Numina</h1>
+  </div>
+
+  <!-- First 48 images -->
+  <div class="gallery-grid">
+    {main.map((img, i) => (
+      <div>
+        <Image
+          src={img}
+          alt={`Numina ${i + 1}`}
+          widths={[400, 800, 1200]}
+          sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+          format="webp"
+          quality={80}
+          loading={i < 8 ? 'eager' : 'lazy'}
+          class="gallery-image"
+          data-full={img.src}
+        />
+      </div>
+    ))}
+  </div>
+
+  <div class="gallery-description">
+    <p>
+      NUMINA (2020) was a landscape and photo-process project in which conventional landscape aesthetics were enmeshed in purposefully entropic methods of deterioration. The title, latin for the 'spirits of a place,' suggests the intention of the work; to allow for a novel presence, a mystical mode of seeing, to emerge from the photographs. A series of medium-format rolls of Kodak Ektachrome were shot during a single day hike in the Niagara Gorge, and then exposed to a randomly color-shifting lightbulb midway through development, resulting in a color implementation of the sabattier effect (false solarization). These images were often double exposures of the same composition at different points of focus, with the image thereby partially obscuring itself. For NUMINA, these film stills were scanned digitally using an imacon scanner; the scanner software itself determined the final color balance and exposure, which in many cases resulting in significant (and distinctly digital) departures from the film image. This same body of film images was used for Overgrowth, my MFA thesis exhibition, employed as 'negatives' within an analog color printing process. Yet, few images were used for both projects; the digital scanner favored certain characteristics, while the color darkroom favored other ones entirely. NUMINA was also released as an artist's book in a limited edition of 10, pictured below.
+    </p>
+  </div>
+
+  <!-- Last 5 images -->
+  <div class="gallery-grid">
+    {end.map((img, i) => (
+      <div>
+        <Image
+          src={img}
+          alt={`Numina ${i + 49}`}
+          widths={[400, 800, 1200]}
+          sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+          format="webp"
+          quality={80}
+          loading="lazy"
+          class="gallery-image"
+          data-full={img.src}
+        />
+      </div>
+    ))}
+  </div>
+
+  <div class="lightbox" id="lightbox">
+    <div class="lightbox-close">&times;</div>
+    <img src="" alt="" id="lightbox-img" />
+  </div>
+</Layout>
+
+<script>
+  const lightbox = document.getElementById('lightbox');
+  const lightboxImg = document.getElementById('lightbox-img') as HTMLImageElement;
+
+  const allImgs = Array.from(document.querySelectorAll('.gallery-image')) as HTMLImageElement[];
+  const srcs = allImgs.map(img => img.dataset.full || img.src);
+  let currentIndex = 0;
+
+  function showImage(index: number) {
+    currentIndex = (index + srcs.length) % srcs.length;
+    lightboxImg.src = srcs[currentIndex];
+    lightboxImg.alt = allImgs[currentIndex]?.alt || '';
+  }
+
+  function openLightbox(index: number) {
+    showImage(index);
+    lightbox?.classList.add('active');
+  }
+
+  function closeLightbox() {
+    lightbox?.classList.remove('active');
+  }
+
+  document.querySelectorAll('.gallery-grid').forEach(grid => {
+    grid.addEventListener('click', (e) => {
+      const img = (e.target as HTMLElement).closest('.gallery-image') as HTMLImageElement;
+      if (!img) return;
+      const idx = allImgs.indexOf(img);
+      openLightbox(idx >= 0 ? idx : 0);
+    });
+  });
+
+  lightbox?.addEventListener('click', (e) => {
+    const rect = lightboxImg.getBoundingClientRect();
+    const y = e.clientY;
+    if (y < rect.top || y > rect.bottom) {
+      closeLightbox();
+      return;
+    }
+    if (e.clientX < window.innerWidth / 2) {
+      showImage(currentIndex - 1);
+    } else {
+      showImage(currentIndex + 1);
+    }
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (!lightbox?.classList.contains('active')) return;
+    if (e.key === 'Escape') closeLightbox();
+    if (e.key === 'ArrowLeft') showImage(currentIndex - 1);
+    if (e.key === 'ArrowRight') showImage(currentIndex + 1);
+  });
+
+  let touchStartX = 0;
+  let touchEndX = 0;
+  lightbox?.addEventListener('touchstart', (e) => {
+    touchStartX = e.changedTouches[0].screenX;
+  }, { passive: true });
+  lightbox?.addEventListener('touchend', (e) => {
+    touchEndX = e.changedTouches[0].screenX;
+    const diff = touchStartX - touchEndX;
+    if (Math.abs(diff) > 50) {
+      if (diff > 0) showImage(currentIndex + 1);
+      else showImage(currentIndex - 1);
+    }
+  }, { passive: true });
+</script>

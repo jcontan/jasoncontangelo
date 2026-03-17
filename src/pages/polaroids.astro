@@ -1,66 +1,60 @@
 ---
+import Layout from '../components/Layout.astro';
 import { Image } from 'astro:assets';
 
-interface Props {
-  slug: string;
-  captionPattern?: string;
-}
-
-const { slug, captionPattern } = Astro.props;
-
-// Import all gallery images dynamically
 const allImages = import.meta.glob<{ default: ImageMetadata }>(
-  '/src/assets/galleries/**/*.{jpg,jpeg,png,webp}',
+  '/src/assets/galleries/polaroids/*.{jpg,jpeg,png,webp}',
   { eager: true }
 );
 
-// Filter to just this gallery's images and sort by filename
-const galleryImages = Object.entries(allImages)
-  .filter(([path]) => path.includes(`/galleries/${slug}/`))
+const images = Object.entries(allImages)
   .sort(([a], [b]) => a.localeCompare(b, undefined, { numeric: true }))
-  .map(([path, mod]) => ({
-    src: mod.default,
-    filename: path.split('/').pop()?.replace(/\.\w+$/, '') || '',
-  }));
-
-function getCaption(filename: string, index: number): string | null {
-  if (!captionPattern) return null;
-  return captionPattern.replace('{n}', String(index + 1));
-}
+  .map(([path, mod]) => mod.default);
 ---
 
-<div class="gallery-grid">
-  {galleryImages.map((img, i) => (
-    <div>
-      <Image
-        src={img.src}
-        alt={getCaption(img.filename, i) || `Image ${i + 1}`}
-        widths={[400, 800, 1200]}
-        sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
-        format="webp"
-        quality={80}
-        loading={i < 8 ? 'eager' : 'lazy'}
-        class="gallery-image"
-        data-full={img.src.src}
-      />
-      {getCaption(img.filename, i) && (
-        <div class="gallery-caption">{getCaption(img.filename, i)}</div>
-      )}
-    </div>
-  ))}
-</div>
+<Layout title="Polaroids">
+  <div class="gallery-header">
+    <h1>Polaroids</h1>
+  </div>
 
-<div class="lightbox" id="lightbox">
-  <div class="lightbox-close">&times;</div>
-  <img src="" alt="" id="lightbox-img" />
-</div>
+  <div class="gallery-grid polaroid-grid">
+    {images.map((img, i) => (
+      <div>
+        <Image
+          src={img}
+          alt={`Polaroids ${i + 1}`}
+          widths={[400, 800, 1200]}
+          sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+          format="webp"
+          quality={80}
+          loading={i < 8 ? 'eager' : 'lazy'}
+          class="gallery-image"
+          data-full={img.src}
+        />
+      </div>
+    ))}
+  </div>
+
+  <div class="gallery-description">
+    <p>Selected Polaroids, various years (2020-Ongoing).</p>
+  </div>
+
+  <div class="lightbox" id="lightbox">
+    <div class="lightbox-close">&times;</div>
+    <img src="" alt="" id="lightbox-img" />
+  </div>
+</Layout>
+
+<style>
+  .polaroid-grid img {
+    aspect-ratio: 4 / 5;
+  }
+</style>
 
 <script>
-  const grid = document.querySelector('.gallery-grid');
   const lightbox = document.getElementById('lightbox');
   const lightboxImg = document.getElementById('lightbox-img') as HTMLImageElement;
 
-  // Collect all full-res image URLs in order
   const allImgs = Array.from(document.querySelectorAll('.gallery-image')) as HTMLImageElement[];
   const srcs = allImgs.map(img => img.dataset.full || img.src);
   let currentIndex = 0;
@@ -80,7 +74,7 @@ function getCaption(filename: string, index: number): string | null {
     lightbox?.classList.remove('active');
   }
 
-  grid?.addEventListener('click', (e) => {
+  document.querySelector('.gallery-grid')?.addEventListener('click', (e) => {
     const img = (e.target as HTMLElement).closest('.gallery-image') as HTMLImageElement;
     if (!img) return;
     const idx = allImgs.indexOf(img);
@@ -90,12 +84,10 @@ function getCaption(filename: string, index: number): string | null {
   lightbox?.addEventListener('click', (e) => {
     const rect = lightboxImg.getBoundingClientRect();
     const y = e.clientY;
-    // Click above or below image → close
     if (y < rect.top || y > rect.bottom) {
       closeLightbox();
       return;
     }
-    // Left half of viewport → prev, right half → next
     if (e.clientX < window.innerWidth / 2) {
       showImage(currentIndex - 1);
     } else {
@@ -110,7 +102,6 @@ function getCaption(filename: string, index: number): string | null {
     if (e.key === 'ArrowRight') showImage(currentIndex + 1);
   });
 
-  // Touch swipe support
   let touchStartX = 0;
   let touchEndX = 0;
   lightbox?.addEventListener('touchstart', (e) => {
