@@ -239,7 +239,7 @@ h1, h2, h3 {
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  padding: 2rem 2rem 2rem;
+  padding: 0 2rem 2rem;
 }
 
 .hero img {
