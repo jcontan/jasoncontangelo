@@ -48,7 +48,6 @@ h1, h2, h3 {
   left: 50%;
   transform: translateX(-50%);
   z-index: 500;
-  overflow: hidden;
   width: fit-content;
   max-width: calc(100% - 2rem);
 }
@@ -123,6 +122,10 @@ h1, h2, h3 {
 
 /* ========== Dropdown ========== */
 .nav-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
   background: #ffffff;
   border-radius: 0;
   max-height: 0;
@@ -130,8 +133,7 @@ h1, h2, h3 {
   transition: max-height 0.35s ease;
   display: flex;
   flex-direction: column;
-  width: 0;
-  min-width: 100%;
+  min-width: 340px;
 }
 
 .nav-dropdown.active {
